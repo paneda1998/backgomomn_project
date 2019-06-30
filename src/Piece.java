@@ -6,6 +6,7 @@ public class Piece {
     int y;
     int oldx;
     int oldy;
+    int z;
     boolean ingame;
     String  color;
     ArrayList possible_positions_x = new ArrayList<Integer>();
