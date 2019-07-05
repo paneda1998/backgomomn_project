@@ -28,7 +28,7 @@ public class MainPanel extends JPanel {
     int player1DiceSum=0;
     int player2DiceSum=0;
     ArrayList<Piece> pieces = new ArrayList<>();
-    ArrayList<Piece>possiblePieces = new ArrayList<>();
+    Boolean[] possiblePieces = new Boolean[31];
     int[] whiteInPlace= new int[25];
     int[] blackInPlace= new int[25];
 
@@ -99,6 +99,7 @@ public class MainPanel extends JPanel {
         whiteInPlace[12] = 0;   whiteInPlace[24] = 2;   blackInPlace[24] = 0;   blackInPlace[12] = 5;
 
         //cordinates according to white
+        cordinator[0]=null;
         cordinator[1] = new BoardCordinates(768, 820, false);
         cordinator[2] = new BoardCordinates(714, 768, false);
         cordinator[3] = new BoardCordinates(660, 714, false);
@@ -140,35 +141,91 @@ public class MainPanel extends JPanel {
         addMouseListener(new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                System.out.println(e.getY());
+                //System.out.println(e.getY());
 
-                if ((dice.getMaxX() > e.getX() & dice.getMinX() < e.getX() & dice.getMaxY() > e.getY() & dice.getMinY() < e.getY())|(dice1.getMaxX() > e.getX() & dice1.getMinX() < e.getX() & dice1.getMaxY() > e.getY() & dice1.getMinY() < e.getY())) {
+                if ((dice.getMaxX() > e.getX() & dice.getMinX() < e.getX() & dice.getMaxY() > e.getY() & dice.getMinY() < e.getY()) | (dice1.getMaxX() > e.getX() & dice1.getMinX() < e.getX() & dice1.getMaxY() > e.getY() & dice1.getMinY() < e.getY())) {
                     dice.randomGenerator();
                     dice1.randomGenerator();
                     repaint();
-                    if(tt==1)
-                        turn*=-1;
-                    if(dice.getRand()!=dice1.getRand()){
-                        if(turn==1)
-                            player1DiceSum+=dice.getRand()+dice1.getRand();
-                        if(turn==-1)
-                            player2DiceSum+=dice.getRand()+dice1.getRand();
+                    if (tt == 1)
+                        turn *= -1;
+                    if (dice.getRand() != dice1.getRand()) {
+                        if (turn == 1)
+                            player1DiceSum += dice.getRand() + dice1.getRand();
+                        if (turn == -1)
+                            player2DiceSum += dice.getRand() + dice1.getRand();
+                    } else {
+                        if (turn == 1)
+                            player1DiceSum += 4 * dice.getRand();
+                        if (turn == -1)
+                            player2DiceSum += 4 * dice.getRand();
                     }
-                    else {
-                        if(turn==1)
-                            player1DiceSum+=4*dice.getRand();
-                        if(turn==-1)
-                            player2DiceSum+=4*dice.getRand();
-                    }
-                    tt=1;
+                    tt = 1;
                     System.out.println(turn);
-
-
                 }
                 //!!!after each move, possible positions should become null
 
                 // TODO: 6/28/2019 add showing possible pieces
+                if (dice.getBegin() == 1 ){
+                    if(turn ==1) {
+                        for (int i = 1; i < 25; i++) {
+                            if ((dice.active && i - dice.getRand() > 0 && blackInPlace[i - dice.getRand()] == 0)) {//sharte harekat sefid bedone zadan
+                                for (int j = 16; j < 31; j++) {     //the piece is in the selected cordinate                    //the piece is the topest in the cordinate
+                                    if (pieces.get(j).x + 10 < cordinator[i].xcordinateEnd && pieces.get(j).x + 10 > cordinator[i].xcordinateBegin && (((46 * (whiteInPlace[i] - 1) + 28 - 10 < pieces.get(j).y && pieces.get(j).y < 46 * (whiteInPlace[i] - 1) + 28 + 10)) || ((464 - 46 * (whiteInPlace[i] - 1) - 10 < pieces.get(j).y && pieces.get(j).y < 464 - 46 * (whiteInPlace[i] - 1) + 10)))) {
+                                        possiblePieces[j] = true;
+                                        // System.out.println(i);
+                                        //System.out.println(j);
+                                        pieces.get(j).possibleCordinates[i - dice.getRand()] = true;
+                                    }
+                                }
 
+                            }
+                            if (dice1.active && i - dice1.getRand() > 0 && blackInPlace[i - dice1.getRand()] == 0) {
+                                for (int j = 16; j < 31; j++) {     //the piece is in the selected cordinate                    //the piece is the topest in the cordinate
+                                    if (pieces.get(j).x + 10 < cordinator[i].xcordinateEnd && pieces.get(j).x + 10 > cordinator[i].xcordinateBegin && (((46 * (whiteInPlace[i] - 1) + 28 - 10 < pieces.get(j).y && pieces.get(j).y < 46 * (whiteInPlace[i] - 1) + 28 + 10)) || ((464 - 46 * (whiteInPlace[i] - 1) - 10 < pieces.get(j).y && pieces.get(j).y < 464 - 46 * (whiteInPlace[i] - 1) + 10)))) {
+                                        possiblePieces[j] = true;
+                                        pieces.get(j).possibleCordinates[i - dice1.getRand()] = true;
+                                    }
+                                }
+
+                            }
+                        }
+                    }
+
+                    else {
+                        for (int i = 1; i < 25; i++) {
+                            if ((dice.active && i + dice.getRand() < 25 && whiteInPlace[i + dice.getRand()] == 0)) {//sharte harekat sefid bedone zadan
+                                for (int j = 1; j < 16; j++) {     //the piece is in the selected cordinate                    //the piece is the topest in the cordinate
+                                    if (pieces.get(j).x + 10 < cordinator[i].xcordinateEnd && pieces.get(j).x + 10 > cordinator[i].xcordinateBegin && (((46 * (blackInPlace[i] - 1) + 28 - 10 < pieces.get(j).y && pieces.get(j).y < 46 * (blackInPlace[i] - 1) + 28 + 10)) || ((464 - 46 * (blackInPlace[i] - 1) - 10 < pieces.get(j).y && pieces.get(j).y < 464 - 46 * (blackInPlace[i] - 1) + 10)))) {
+                                        possiblePieces[j] = true;
+                                        // System.out.println(i);
+                                        //System.out.println(j);
+                                        pieces.get(j).possibleCordinates[i + dice.getRand()] = true;
+                                    }
+                                }
+
+                            }
+                            if ((dice1.active && i + dice1.getRand() < 25 && whiteInPlace[i + dice1.getRand()] == 0)) {//sharte harekat sefid bedone zadan
+                                for (int j = 1; j < 16; j++) {     //the piece is in the selected cordinate                    //the piece is the topest in the cordinate
+                                    if (pieces.get(j).x + 10 < cordinator[i].xcordinateEnd && pieces.get(j).x + 10 > cordinator[i].xcordinateBegin && (((46 * (blackInPlace[i] - 1) + 28 - 10 < pieces.get(j).y && pieces.get(j).y < 46 * (blackInPlace[i] - 1) + 28 + 10)) || ((464 - 46 * (blackInPlace[i] - 1) - 10 < pieces.get(j).y && pieces.get(j).y < 464 - 46 * (blackInPlace[i] - 1) + 10)))) {
+                                        possiblePieces[j] = true;
+                                        // System.out.println(i);
+                                        //System.out.println(j);
+                                        pieces.get(j).possibleCordinates[i + dice1.getRand()] = true;
+                                    }
+                                }
+
+                            }
+                        }
+                    }
+
+
+                }
+                for (int i = 1; i <31 ; i++) {
+                    //for (int j = 1; j <25; j++) {
+                        System.out.println(possiblePieces[i]);
+                    //}
+                }
             }
 
             @Override
@@ -244,7 +301,7 @@ public class MainPanel extends JPanel {
         g.setColor(Color.BLACK);
         dice.paint((Graphics2D) g);
         dice1.paint((Graphics2D) g);
-        // g.drawString("ssss",450,278);
+       // g.drawString("ssss",450,278);
 
         while(dice.getBegin()==0){
             if(dice.getRand()>dice1.getRand()){
