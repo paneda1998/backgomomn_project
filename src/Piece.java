@@ -1,28 +1,28 @@
+import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
-public class Piece {
+public class Piece implements Animatable{
     int x;
     int y;
     int oldx;
     int oldy;
-    int z;
     boolean ingame;
+    BufferedImage pieceImage;
     String  color;
-    ArrayList possible_positions_x = new ArrayList<Integer>();
-    ArrayList possible_positions_y = new ArrayList<Integer>();
-    ArrayList possible_positions_hit_x = new ArrayList<Integer>();
-    ArrayList possible_positions_hit_y = new ArrayList<Integer>();
+    Boolean[] possibleCordinates = new Boolean[24];
+    Boolean[] possibleCordinatesHit = new Boolean[24];
 
-    public Piece(int x, int y, boolean ingame, String color) {
+    public Piece(int x, int y, boolean ingame, String color, BufferedImage pieceImage) {
         this.x = x;
         this.y = y;
         this.ingame = ingame;
         this.color = color;
-
+        this.pieceImage = pieceImage;
     }
-// public viod DrawCircle(Graphics g){
-
-
-    //  }
+    @Override
+    public void paint(Graphics2D graphics2D){
+        graphics2D.drawImage(pieceImage, x, y, null);
+    }
 }
