@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import static java.lang.StrictMath.abs;
+
 public class MainPanel extends JPanel {
     BufferedImage bufferedImage;
     BufferedImage bufferedImagebg;
@@ -18,6 +20,7 @@ public class MainPanel extends JPanel {
     BufferedImage blackPieceHighlight;
     BufferedImage whitePieceHighlight;
 
+    boolean[] extraCordinates = new boolean[25];
     int X;
     int Y;
     int movedFrom;
@@ -28,7 +31,7 @@ public class MainPanel extends JPanel {
     int player1DiceSum=0;
     int player2DiceSum=0;
     ArrayList<Piece> pieces = new ArrayList<>();
-    Boolean[] possiblePieces = new Boolean[31];
+    boolean[] possiblePieces = new boolean[31];
     int[] whiteInPlace= new int[25];
     int[] blackInPlace= new int[25];
 
@@ -146,6 +149,10 @@ public class MainPanel extends JPanel {
                 if ((dice.getMaxX() > e.getX() & dice.getMinX() < e.getX() & dice.getMaxY() > e.getY() & dice.getMinY() < e.getY()) | (dice1.getMaxX() > e.getX() & dice1.getMinX() < e.getX() & dice1.getMaxY() > e.getY() & dice1.getMinY() < e.getY())) {
                     dice.randomGenerator();
                     dice1.randomGenerator();
+                    dice.active=true;
+                    dice1.active=true;
+                    dice2.active=true;
+                    dice3.active=true;
                     repaint();
                     if (tt == 1)
                         turn *= -1;
@@ -163,13 +170,27 @@ public class MainPanel extends JPanel {
                     tt = 1;
                     System.out.println(turn);
                 }
-                //!!!after each move, possible positions should become null
 
-                // TODO: 6/28/2019 add showing possible pieces
+                for (int i = 30; i <31 ; i++) {
+                    for (int j = 1; j <25; j++) {
+                        System.out.println(pieces.get(i).possibleCordinates[j]);
+                    }
+                }
+
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
                 if (dice.getBegin() == 1 ){
+                    for (int i = 1; i <31 ; i++) {
+                        possiblePieces[i] = false;
+                        for (int j = 1; j <25 ; j++) {
+                            pieces.get(i).possibleCordinates[j] = false;
+                        }
+                    }
                     if(turn ==1) {
                         for (int i = 1; i < 25; i++) {
-                            if ((dice.active && i - dice.getRand() > 0 && blackInPlace[i - dice.getRand()] == 0)) {//sharte harekat sefid bedone zadan
+                            if ((dice.active && i - dice.getRand() > 0 && blackInPlace[i - dice.getRand()] <2 )) {//sharte harekat sefid bedone zadan
                                 for (int j = 16; j < 31; j++) {     //the piece is in the selected cordinate                    //the piece is the topest in the cordinate
                                     if (pieces.get(j).x + 10 < cordinator[i].xcordinateEnd && pieces.get(j).x + 10 > cordinator[i].xcordinateBegin && (((46 * (whiteInPlace[i] - 1) + 28 - 10 < pieces.get(j).y && pieces.get(j).y < 46 * (whiteInPlace[i] - 1) + 28 + 10)) || ((464 - 46 * (whiteInPlace[i] - 1) - 10 < pieces.get(j).y && pieces.get(j).y < 464 - 46 * (whiteInPlace[i] - 1) + 10)))) {
                                         possiblePieces[j] = true;
@@ -178,23 +199,21 @@ public class MainPanel extends JPanel {
                                         pieces.get(j).possibleCordinates[i - dice.getRand()] = true;
                                     }
                                 }
-
                             }
-                            if (dice1.active && i - dice1.getRand() > 0 && blackInPlace[i - dice1.getRand()] == 0) {
+                            if (dice1.active && i - dice1.getRand() > 0 && blackInPlace[i - dice1.getRand()] <2 ) {
                                 for (int j = 16; j < 31; j++) {     //the piece is in the selected cordinate                    //the piece is the topest in the cordinate
                                     if (pieces.get(j).x + 10 < cordinator[i].xcordinateEnd && pieces.get(j).x + 10 > cordinator[i].xcordinateBegin && (((46 * (whiteInPlace[i] - 1) + 28 - 10 < pieces.get(j).y && pieces.get(j).y < 46 * (whiteInPlace[i] - 1) + 28 + 10)) || ((464 - 46 * (whiteInPlace[i] - 1) - 10 < pieces.get(j).y && pieces.get(j).y < 464 - 46 * (whiteInPlace[i] - 1) + 10)))) {
                                         possiblePieces[j] = true;
                                         pieces.get(j).possibleCordinates[i - dice1.getRand()] = true;
                                     }
                                 }
-
                             }
                         }
                     }
 
                     else {
                         for (int i = 1; i < 25; i++) {
-                            if ((dice.active && i + dice.getRand() < 25 && whiteInPlace[i + dice.getRand()] == 0)) {//sharte harekat sefid bedone zadan
+                            if ((dice.active && i + dice.getRand() < 25 && whiteInPlace[i + dice.getRand()] <2)) {//sharte harekat sefid bedone zadan
                                 for (int j = 1; j < 16; j++) {     //the piece is in the selected cordinate                    //the piece is the topest in the cordinate
                                     if (pieces.get(j).x + 10 < cordinator[i].xcordinateEnd && pieces.get(j).x + 10 > cordinator[i].xcordinateBegin && (((46 * (blackInPlace[i] - 1) + 28 - 10 < pieces.get(j).y && pieces.get(j).y < 46 * (blackInPlace[i] - 1) + 28 + 10)) || ((464 - 46 * (blackInPlace[i] - 1) - 10 < pieces.get(j).y && pieces.get(j).y < 464 - 46 * (blackInPlace[i] - 1) + 10)))) {
                                         possiblePieces[j] = true;
@@ -203,9 +222,8 @@ public class MainPanel extends JPanel {
                                         pieces.get(j).possibleCordinates[i + dice.getRand()] = true;
                                     }
                                 }
-
                             }
-                            if ((dice1.active && i + dice1.getRand() < 25 && whiteInPlace[i + dice1.getRand()] == 0)) {//sharte harekat sefid bedone zadan
+                            if ((dice1.active && i + dice1.getRand() < 25 && whiteInPlace[i + dice1.getRand()] <2)) {//sharte harekat sefid bedone zadan
                                 for (int j = 1; j < 16; j++) {     //the piece is in the selected cordinate                    //the piece is the topest in the cordinate
                                     if (pieces.get(j).x + 10 < cordinator[i].xcordinateEnd && pieces.get(j).x + 10 > cordinator[i].xcordinateBegin && (((46 * (blackInPlace[i] - 1) + 28 - 10 < pieces.get(j).y && pieces.get(j).y < 46 * (blackInPlace[i] - 1) + 28 + 10)) || ((464 - 46 * (blackInPlace[i] - 1) - 10 < pieces.get(j).y && pieces.get(j).y < 464 - 46 * (blackInPlace[i] - 1) + 10)))) {
                                         possiblePieces[j] = true;
@@ -214,22 +232,10 @@ public class MainPanel extends JPanel {
                                         pieces.get(j).possibleCordinates[i + dice1.getRand()] = true;
                                     }
                                 }
-
                             }
                         }
                     }
-
-
                 }
-                for (int i = 1; i <31 ; i++) {
-                    //for (int j = 1; j <25; j++) {
-                        System.out.println(possiblePieces[i]);
-                    //}
-                }
-            }
-
-            @Override
-            public void mousePressed(MouseEvent e) {
                 clickedPiece = 0;
                 for (int i = 1; i < 31; i++) {
                     flag = false;
@@ -252,28 +258,61 @@ public class MainPanel extends JPanel {
             public void mouseReleased(MouseEvent e) {
                 if (flag && e.getY() < 520) {                           //a piece has been clicked and now it is releasing in the board
                     for (int i = 1; i <25 ; i++) {
-                        if (cordinator[i].xcordinateBegin < e.getX() && cordinator[i].xcordinateEnd > e.getX() && ((e.getY() < 278 && cordinator[i].top) || (e.getY() > 278 && !cordinator[i].top))) {
+                        if (cordinator[i].xcordinateBegin < e.getX() && cordinator[i].xcordinateEnd > e.getX() && ((e.getY() < 278 && cordinator[i].top) || (e.getY() > 278 && !cordinator[i].top)) && pieces.get(clickedPiece).possibleCordinates[i]) {
                             pieces.get(clickedPiece).oldx = pieces.get(clickedPiece).x;
                             pieces.get(clickedPiece).x = cordinator[i].xcordinateBegin+5;
                             temp = blackInPlace[i] + whiteInPlace[i];
                             pieces.get(clickedPiece).oldy = pieces.get(clickedPiece).y;
                             if (cordinator[i].top)
-                                pieces.get(clickedPiece).y = 46*temp + 28;
+                                if (temp < 5)
+                                    pieces.get(clickedPiece).y = 46*temp + 28;
+                                else{
+                                    pieces.get(clickedPiece).y = 46*4 + 28;
+                                    extraCordinates[i] = true;}
 
-                            else if (!cordinator[i].top)
-                                pieces.get(clickedPiece).y = 510 - 46*temp - 46;
+                            if (!cordinator[i].top)
+                                if (temp < 5)
+                                    pieces.get(clickedPiece).y = 510 - 46*temp - 46;
+                                else{
+                                    pieces.get(clickedPiece).y = 510 - 46*4 - 46;
+                                    extraCordinates[i] = true;}
 
                             if (pieces.get(clickedPiece).color == "white"){
                                 whiteInPlace[movedFrom]--;
+                                if (whiteInPlace[movedFrom]<6)
+                                    extraCordinates[movedFrom] = false;
                                 whiteInPlace[i]++;
                             }
                             else if (pieces.get(clickedPiece).color == "black"){
                                 blackInPlace[movedFrom]--;
+                                if (blackInPlace[movedFrom]<6)
+                                    extraCordinates[movedFrom] = false;
                                 blackInPlace[i]++;
                             }
+                            if(dice.getRand()!=dice1.getRand()){
+                                    if((dice.getRand() == movedFrom-i)|(dice.getRand()==i-movedFrom))
+                                        dice.active=false;
+                                if((dice1.getRand() == movedFrom-i)|(dice1.getRand()==i-movedFrom))
+                                    dice1.active=false;
+                            }
+                            if(dice.getRand()==dice1.getRand()){
+                                if(dice.active&&((dice.getRand() == movedFrom-i)|(dice.getRand()==i-movedFrom)))
+                                    dice.active=false;
+                                else if(dice1.active&&((dice1.getRand() == movedFrom-i)|(dice1.getRand()==i-movedFrom)))
+                                    dice1.active=false;
+                                else if(dice2.active&&((dice2.getRand() == movedFrom-i)|(dice2.getRand()==i-movedFrom)))
+                                    dice2.active=false;
+                                else if(dice3.active&&((dice3.getRand() == movedFrom-i)|(dice3.getRand()==i-movedFrom)))
+                                    dice3.active=false;
+                            }
+
+
+
+
                         }
                     }
                 }
+                System.out.println(whiteInPlace[6]);
                 repaint();
             }
 
@@ -301,7 +340,7 @@ public class MainPanel extends JPanel {
         g.setColor(Color.BLACK);
         dice.paint((Graphics2D) g);
         dice1.paint((Graphics2D) g);
-       // g.drawString("ssss",450,278);
+        //g.drawString("ssss",450,278);
 
         while(dice.getBegin()==0){
             if(dice.getRand()>dice1.getRand()){
@@ -334,6 +373,16 @@ public class MainPanel extends JPanel {
                 g.drawImage(blackPieceNotHighlighted, pieces.get(i).x, pieces.get(i).y, null);
             else if(pieces.get(i).color=="white")
                 g.drawImage(whitePieceNotHighlighted, pieces.get(i).x, pieces.get(i).y, null);
+        }
+        //writing number on pieces in cordinates more than five
+        for (int i = 1; i <25 ; i++) {
+            temp = whiteInPlace[i] + blackInPlace[i];
+            if (extraCordinates[i] && cordinator[i].top)
+                g.drawString(Integer.toString(temp-5), cordinator[i].xcordinateMean-5, 46 * 5 + 28 -10);
+            if (extraCordinates[i] && !cordinator[i].top)
+                g.drawString(Integer.toString(temp-5), cordinator[i].xcordinateMean-5, 510 - 46 * 5 +35);
+
+
         }
 
     }
