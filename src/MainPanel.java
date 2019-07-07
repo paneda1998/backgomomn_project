@@ -1,6 +1,7 @@
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.Color;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
@@ -10,19 +11,28 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import static java.awt.Color.GREEN;
+import static java.awt.Color.green;
 import static java.lang.StrictMath.abs;
 
 public class MainPanel extends JPanel {
+    Polygon triangle = new Polygon();
+    Polygon triangle1 = new Polygon();
     BufferedImage bufferedImage;
     BufferedImage bufferedImagebg;
     BufferedImage blackPieceNotHighlighted;
     BufferedImage whitePieceNotHighlighted;
     BufferedImage blackPieceHighlight;
     BufferedImage whitePieceHighlight;
-
+    int whiteWin=15;
+    int blackWin=15;
+    int counter = 0;
+    boolean whiteEnd= false;
+    boolean blackEnd=false;
     boolean[] extraCordinates = new boolean[25];
     int X;
     int Y;
+    int fuck = 0;
     int movedFrom;
     int clickedPiece;
     boolean flag;
@@ -171,184 +181,585 @@ public class MainPanel extends JPanel {
                             player2DiceSum += 4 * dice.getRand();
                     }
                     tt = 1;
-                    //System.out.println(turn);
                 }
-
-//                for (int i = 30; i <31 ; i++) {
-//                    for (int j = 1; j <25; j++) {
-//                        System.out.println(pieces.get(i).possibleCordinates[j]);
-//                    }
-//                }
-
             }
 
             @Override
             public void mousePressed(MouseEvent e) {
-                if (dice.getBegin() == 1 ){
-                    for (int i = 1; i <31 ; i++) {
-                        possiblePieces[i] = false;
-                        for (int j = 1; j <25 ; j++) {
-                            pieces.get(i).possibleCordinates[j] = false;
-                        }
-                    }
-                    if(turn ==1) {
-                        for (int i = 1; i < 25; i++) {
-                            if ((dice.active && i - dice.getRand() > 0 && blackInPlace[i - dice.getRand()] <2 )) {//sharte harekat sefid bedone zadan
-                                for (int j = 16; j < 31; j++) {     //the piece is in the selected cordinate// the piece is the topest in the cordinate
-                                    int k = whiteInPlace[i];
-                                    if(whiteInPlace[i]>5) k=5;
-                                    if (pieces.get(j).x + 20 < cordinator[i].xcordinateEnd && pieces.get(j).x + 20 > cordinator[i].xcordinateBegin && (((46 * (k - 1) + 28 - 20 < pieces.get(j).y && pieces.get(j).y < 46 * (k - 1) + 28 + 20)) || ((464 - 46 * (k - 1) - 20 < pieces.get(j).y && pieces.get(j).y < 464 - 46 * (k - 1) + 20)))) {
-                                        possiblePieces[j] = true;
-                                        // System.out.println(i);
-                                        //System.out.println(j);
-                                        pieces.get(j).possibleCordinates[i - dice.getRand()] = true;
-                                    }
-                                }
-                            }
-                            if (dice1.active && i - dice1.getRand() > 0 && blackInPlace[i - dice1.getRand()] <2 ) {
-                                for (int j = 16; j < 31; j++) {     //the piece is in the selected cordinate                    //the piece is the topest in the cordinate
-                                    int k = whiteInPlace[i];
-                                    if(whiteInPlace[i]>5) k=5;
-                                    if (pieces.get(j).x + 20 < cordinator[i].xcordinateEnd && pieces.get(j).x + 20 > cordinator[i].xcordinateBegin && (((46 * (k - 1) + 28 - 20 < pieces.get(j).y && pieces.get(j).y < 46 * (k - 1) + 28 + 20)) || ((464 - 46 * (k - 1) - 20 < pieces.get(j).y && pieces.get(j).y < 464 - 46 * (k - 1) + 20)))) {
-                                        possiblePieces[j] = true;
-                                        pieces.get(j).possibleCordinates[i - dice1.getRand()] = true;
-                                    }
-                                }
-                            }
-                        }
-                    }
+                whiteEnd = false;
+                blackEnd = false;
 
-                    else {
-                        for (int i = 1; i < 25; i++) {
-                            if ((dice.active && i + dice.getRand() < 25 && whiteInPlace[i + dice.getRand()] <2)) {//sharte harekat sefid bedone zadan
-                                for (int j = 1; j < 16; j++) {     //the piece is in the selected cordinate                    //the piece is the topest in the cordinate
-                                    int k = blackInPlace[i];
-                                    if(blackInPlace[i]>5) k=5;
-                                    if (pieces.get(j).x + 20 < cordinator[i].xcordinateEnd && pieces.get(j).x + 20 > cordinator[i].xcordinateBegin && (((46 * (k - 1) + 28 - 20 < pieces.get(j).y && pieces.get(j).y < 46 * (k - 1) + 28 + 20)) || ((464 - 46 * (k - 1) - 20 < pieces.get(j).y && pieces.get(j).y < 464 - 46 * (k - 1) + 20)))) {
-                                        possiblePieces[j] = true;
-                                        // System.out.println(i);
-                                        //System.out.println(j);
-                                        pieces.get(j).possibleCordinates[i + dice.getRand()] = true;
+                {
+                    if (dice.getBegin() == 1) {
+                        for (int i = 1; i < 31; i++) {
+                            possiblePieces[i] = false;
+                            for (int j = 1; j < 25; j++) {
+                                pieces.get(i).possibleCordinates[j] = false;
+                            }
+                        }
+                        if (turn == 1) {
+                            for (int i = 1; i < 25; i++) {
+                                if ((dice.active && i - dice.getRand() > 0 && blackInPlace[i - dice.getRand()] < 2)) {//sharte harekat sefid bedone zadan
+                                    for (int j = 16; j < 31; j++) {     //the piece is in the selected cordinate// the piece is the topest in the cordinate
+                                        int k = whiteInPlace[i];
+                                        if (whiteInPlace[i] > 5) k = 5;
+                                        if (pieces.get(j).x + 20 < cordinator[i].xcordinateEnd && pieces.get(j).x + 20 > cordinator[i].xcordinateBegin && (((46 * (k - 1) + 28 - 20 < pieces.get(j).y && pieces.get(j).y < 46 * (k - 1) + 28 + 20)) || ((464 - 46 * (k - 1) - 20 < pieces.get(j).y && pieces.get(j).y < 464 - 46 * (k - 1) + 20)))) {
+                                            possiblePieces[j] = true;
+                                            pieces.get(j).possibleCordinates[i - dice.getRand()] = true;
+                                        }
+                                    }
+                                }
+                                if (dice1.active && i - dice1.getRand() > 0 && blackInPlace[i - dice1.getRand()] < 2) {
+                                    for (int j = 16; j < 31; j++) {     //the piece is in the selected cordinate                    //the piece is the topest in the cordinate
+                                        int k = whiteInPlace[i];
+                                        if (whiteInPlace[i] > 5) k = 5;
+                                        if (pieces.get(j).x + 20 < cordinator[i].xcordinateEnd && pieces.get(j).x + 20 > cordinator[i].xcordinateBegin && (((46 * (k - 1) + 28 - 20 < pieces.get(j).y && pieces.get(j).y < 46 * (k - 1) + 28 + 20)) || ((464 - 46 * (k - 1) - 20 < pieces.get(j).y && pieces.get(j).y < 464 - 46 * (k - 1) + 20)))) {
+                                            possiblePieces[j] = true;
+                                            pieces.get(j).possibleCordinates[i - dice1.getRand()] = true;
+                                        }
                                     }
                                 }
                             }
-                            if ((dice1.active && i + dice1.getRand() < 25 && whiteInPlace[i + dice1.getRand()] <2)) {//sharte harekat sefid bedone zadan
-                                for (int j = 1; j < 16; j++) {     //the piece is in the selected cordinate                    //the piece is the topest in the cordinate
-                                    int k = blackInPlace[i];
-                                    if(blackInPlace[i]>5) k=5;
-                                    if (pieces.get(j).x + 20 < cordinator[i].xcordinateEnd && pieces.get(j).x + 20 > cordinator[i].xcordinateBegin && (((46 * (k - 1) + 28 - 20 < pieces.get(j).y && pieces.get(j).y < 46 * (k - 1) + 28 + 20)) || ((464 - 46 * (k - 1) - 20 < pieces.get(j).y && pieces.get(j).y < 464 - 46 * (k - 1) + 20)))) {
-                                        possiblePieces[j] = true;
-                                        // System.out.println(i);
-                                        //System.out.println(j);
-                                        pieces.get(j).possibleCordinates[i + dice1.getRand()] = true;
+                        } else {
+                            for (int i = 1; i < 25; i++) {
+                                if ((dice.active && i + dice.getRand() < 25 && whiteInPlace[i + dice.getRand()] < 2)) {//sharte harekat sefid bedone zadan
+                                    for (int j = 1; j < 16; j++) {     //the piece is in the selected cordinate                    //the piece is the topest in the cordinate
+                                        int k = blackInPlace[i];
+                                        if (blackInPlace[i] > 5) k = 5;
+                                        if (pieces.get(j).x + 20 < cordinator[i].xcordinateEnd && pieces.get(j).x + 20 > cordinator[i].xcordinateBegin && (((46 * (k - 1) + 28 - 20 < pieces.get(j).y && pieces.get(j).y < 46 * (k - 1) + 28 + 20)) || ((464 - 46 * (k - 1) - 20 < pieces.get(j).y && pieces.get(j).y < 464 - 46 * (k - 1) + 20)))) {
+                                            possiblePieces[j] = true;
+                                            // System.out.println(i);
+                                            //System.out.println(j);
+                                            pieces.get(j).possibleCordinates[i + dice.getRand()] = true;
+                                        }
+                                    }
+                                }
+                                if ((dice1.active && i + dice1.getRand() < 25 && whiteInPlace[i + dice1.getRand()] < 2)) {//sharte harekat sefid bedone zadan
+                                    for (int j = 1; j < 16; j++) {     //the piece is in the selected cordinate                    //the piece is the topest in the cordinate
+                                        int k = blackInPlace[i];
+                                        if (blackInPlace[i] > 5) k = 5;
+                                        if (pieces.get(j).x + 20 < cordinator[i].xcordinateEnd && pieces.get(j).x + 20 > cordinator[i].xcordinateBegin && (((46 * (k - 1) + 28 - 20 < pieces.get(j).y && pieces.get(j).y < 46 * (k - 1) + 28 + 20)) || ((464 - 46 * (k - 1) - 20 < pieces.get(j).y && pieces.get(j).y < 464 - 46 * (k - 1) + 20)))) {
+                                            possiblePieces[j] = true;
+                                            // System.out.println(i);
+                                            //System.out.println(j);
+                                            pieces.get(j).possibleCordinates[i + dice1.getRand()] = true;
+                                        }
                                     }
                                 }
                             }
                         }
+                    }
+                    clickedPiece = 0;
+                    for (int i = 1; i < 31; i++) {
+                        flag = false;
+                        if (pieces.get(i).x < e.getX() && pieces.get(i).y < e.getY() && pieces.get(i).x + 46 > e.getX() && pieces.get(i).y + 46 > e.getY()) {
+//                        if ((pieces.get(i).color=="white" && whitePieceOut==0)||(pieces.get(i).color=="black" && blackPieceOut==0)) {
+                            clickedPiece = i;
+                            for (int j = 1; j < 25; j++) {
+                                if (cordinator[j].xcordinateBegin < e.getX() && cordinator[j].xcordinateEnd > e.getX() && ((e.getY() < 278 && cordinator[j].top) || (e.getY() > 278 && !cordinator[j].top))) {
+                                    movedFrom = j;
+
+                                    for (int k = 1; k < 25; k++) {
+                                        if (pieces.get(clickedPiece).possibleCordinates[k]) {
+
+                                            if (cordinator[k].top) {
+                                                triangle.addPoint(cordinator[k].xcordinateMean, 5 * 46 + 28);
+                                                triangle.addPoint(cordinator[k].xcordinateBegin, 28);
+                                                triangle.addPoint(cordinator[k].xcordinateEnd, 28);
+                                            } else if (!cordinator[k].top) {
+                                                triangle.addPoint(cordinator[k].xcordinateMean, 510 - 5 * 46);
+                                                triangle.addPoint(cordinator[k].xcordinateBegin, 510);
+                                                triangle.addPoint(cordinator[k].xcordinateEnd, 510);
+                                            }
+                                            temp = k;
+                                            break;
+                                        }
+                                    }
+                                    for (int k = temp + 1; k < 25; k++) {
+                                        if (pieces.get(clickedPiece).possibleCordinates[k]) {
+
+                                            if (cordinator[k].top) {
+                                                triangle1.addPoint(cordinator[k].xcordinateMean, 5 * 46 + 28);
+                                                triangle1.addPoint(cordinator[k].xcordinateBegin, 28);
+                                                triangle1.addPoint(cordinator[k].xcordinateEnd, 28);
+                                            } else if (!cordinator[k].top) {
+                                                triangle1.addPoint(cordinator[k].xcordinateMean, 510 - 5 * 46);
+                                                triangle1.addPoint(cordinator[k].xcordinateBegin, 510);
+                                                triangle1.addPoint(cordinator[k].xcordinateEnd, 510);
+                                            }
+                                            break;
+                                        }
+                                    }
+                                    repaint();
+                                    break;
+                                }
+                            }
+                            flag = true;                //means that a piece has been clicked
+                            break;
+                        }
+//                        else if (pieces.get(i).x < e.getX() && pieces.get(i).y < e.getY() && pieces.get(i).x + 46 > e.getX() && pieces.get(i).y + 46 > e.getY() && (pieces.get(i).x == 660 || pieces.get(i).x == 260)){
+//                            clickedPiece = i;
+//                            for (int j = 1; j < 31; j++) {
+//                                for (int k = 1; k < 25 ; k++) {
+//                                    if(j != clickedPiece && pieces.get(j).color != pieces.get(clickedPiece).color){
+//                                        pieces.get(j).possibleCordinates[k] = false;
+//                                    }
+//                                }
+//
+//                            }
+//                            flag = true;
+//                        }
+
+//                    }
+
                     }
                 }
-                clickedPiece = 0;
-                for (int i = 1; i < 31; i++) {
-                    flag = false;
-                    // TODO: 6/28/2019 find possible positions of clicked piece
-                    if (pieces.get(i).x < e.getX() && pieces.get(i).y < e.getY() && pieces.get(i).x + 46 > e.getX() && pieces.get(i).y + 46 > e.getY()) {
-                        clickedPiece = i;
-                        for (int j = 1; j <25 ; j++) {
-                            if (cordinator[j].xcordinateBegin < e.getX() && cordinator[j].xcordinateEnd > e.getX() && ((e.getY()<278 && cordinator[j].top)||(e.getY()>278 && !cordinator[j].top))) {
-                                movedFrom = j;
-                                break;
-                            }
-                        }
-                        flag = true;                //means that a piece has been clicked
-                        break;
+                for (int i = 1; i <31 ; i++) {
+                    for (int j = 1; j <25 ; j++) {
+                        System.out.println(pieces.get(i).possibleCordinates[j]);
                     }
+                    System.out.println("" +
+                            "");
+                    System.out.println(possiblePieces[i]);
+
                 }
             }
 
             @Override
             public void mouseReleased(MouseEvent e) {
+                triangle.reset();
+                triangle1.reset();
+
+
+                if (turn == 1 && whiteInPlace[1]+whiteInPlace[2]+whiteInPlace[3]+whiteInPlace[4]+whiteInPlace[5]+whiteInPlace[6]==whiteWin){
+                    whiteEnd = true;
+                }
+                else if(turn == -1 && blackInPlace[24]+blackInPlace[23]+blackInPlace[22]+blackInPlace[21]+blackInPlace[20]+blackInPlace[19]==blackWin){
+                    blackEnd = true;
+                }
                 if (flag && e.getY() < 520) {                           //a piece has been clicked and now it is releasing in the board
-                    for (int i = 1; i <25 ; i++) {
-                        if (cordinator[i].xcordinateBegin < e.getX() && cordinator[i].xcordinateEnd > e.getX() && ((e.getY() < 278 && cordinator[i].top) || (e.getY() > 278 && !cordinator[i].top)) && pieces.get(clickedPiece).possibleCordinates[i] ) {
-                            
-                            if (pieces.get(clickedPiece).color == "white" && blackInPlace[i]==1) {
-                                for (int j = 1; j < 16; j++) {
-                                    if (pieces.get(j).x + 10 < cordinator[i].xcordinateEnd && pieces.get(j).x + 10 > cordinator[i].xcordinateBegin  && ((pieces.get(j).y < 278 && cordinator[i].top) || (pieces.get(j).y > 278 && !cordinator[i].top))) { //&&((pieces.get(clickedPiece).color=="white" && whitePieceOut==0)
-                                        pieces.get(j).oldx = pieces.get(j).x;
-                                        pieces.get(j).x = 660;
-                                        pieces.get(j).oldy = pieces.get(j).y;
-                                        pieces.get(j).y = 700 - blackPieceOut * 46;
-                                        blackPieceOut++;
-                                        blackInPlace[i] = 0;
+                    if (true) {
+                        for (int i = 1; i < 25; i++) {
+                            if ((blackPieceOut != 0 && turn == -1) || (whitePieceOut != 0 && turn == 1)) {
+                                fuck = 0;
+                                if (turn == 1) {
+                                    if (dice.active && i == 25 - dice.getRand() && blackInPlace[i] < 2 && (cordinator[i].xcordinateBegin < e.getX() && cordinator[i].xcordinateEnd > e.getX() && ((e.getY() < 278 && cordinator[i].top)))) {
+
+                                        //System.out.println("vaaaay!");
+                                        if (blackInPlace[i] == 1) {
+                                            for (int j = 1; j < 16; j++) {
+                                                if (pieces.get(j).x + 10 < cordinator[i].xcordinateEnd && pieces.get(j).x + 10 > cordinator[i].xcordinateBegin && ((pieces.get(j).y < 278 && cordinator[i].top) || (pieces.get(j).y > 278 && !cordinator[i].top))) { //
+                                                    pieces.get(j).oldx = pieces.get(j).x;
+                                                    pieces.get(j).x = 660;
+                                                    pieces.get(j).oldy = pieces.get(j).y;
+                                                    pieces.get(j).y = 700 - blackPieceOut * 46;
+                                                    blackPieceOut++;
+                                                    blackInPlace[i] = 0;
+                                                }
+                                            }
+                                        }
+                                        pieces.get(clickedPiece).oldx = pieces.get(clickedPiece).x;
+                                        pieces.get(clickedPiece).oldy = pieces.get(clickedPiece).y;
+                                        pieces.get(clickedPiece).x = cordinator[i].xcordinateBegin + 5;
+
+                                        if (whiteInPlace[i] < 5)
+                                            pieces.get(clickedPiece).y = 46 * whiteInPlace[i] + 28;
+                                        else {
+                                            pieces.get(clickedPiece).y = 46 * 4 + 28;
+                                            extraCordinates[i] = true;
+                                        }
+                                        fuck = 1;
+                                        dice.active = false;
+                                    }
+                                    if (dice1.active && i == 25 - dice1.getRand() && blackInPlace[i] < 2 && (cordinator[i].xcordinateBegin < e.getX() && cordinator[i].xcordinateEnd > e.getX() && ((e.getY() < 278 && cordinator[i].top)))) {
+                                        if (blackInPlace[i] == 1) {
+                                            for (int j = 1; j < 16; j++) {
+                                                if (pieces.get(j).x + 10 < cordinator[i].xcordinateEnd && pieces.get(j).x + 10 > cordinator[i].xcordinateBegin && ((pieces.get(j).y < 278 && cordinator[i].top) || (pieces.get(j).y > 278 && !cordinator[i].top))) { //
+                                                    pieces.get(j).oldx = pieces.get(j).x;
+                                                    pieces.get(j).x = 660;
+                                                    pieces.get(j).oldy = pieces.get(j).y;
+                                                    pieces.get(j).y = 700 - blackPieceOut * 46;
+                                                    blackPieceOut++;
+                                                    blackInPlace[i] = 0;
+                                                }
+                                            }
+                                        }
+                                        pieces.get(clickedPiece).oldx = pieces.get(clickedPiece).x;
+                                        pieces.get(clickedPiece).oldy = pieces.get(clickedPiece).y;
+                                        pieces.get(clickedPiece).x = cordinator[i].xcordinateBegin + 5;
+                                        if (whiteInPlace[i] < 5)
+                                            pieces.get(clickedPiece).y = 46 * whiteInPlace[i] + 28;
+                                        else {
+                                            pieces.get(clickedPiece).y = 46 * 4 + 28;
+                                            extraCordinates[i] = true;
+                                        }
+                                        fuck = 1;
+                                        dice1.active = false;
+                                    }
+                                    if (fuck == 1) {
+                                        whiteInPlace[i]++;
+                                        whitePieceOut--;
+                                    }
+                                    if (dice.getRand() != dice1.getRand()) {
+                                        if ((dice.getRand() == movedFrom - i) | (dice.getRand() == i - movedFrom))
+                                            dice.active = false;
+                                        if ((dice1.getRand() == movedFrom - i) | (dice1.getRand() == i - movedFrom))
+                                            dice1.active = false;}
+                                    if (dice.getRand() == dice1.getRand()) {
+                                        if (dice3.active && 25 - dice3.getRand() == i)
+                                            dice3.active = false;
+                                        else if (dice2.active && 25 - dice2.getRand() == i)
+                                            dice2.active = false;
+                                        else if (dice1.active && 25 - dice1.getRand() == i)
+                                            dice1.active = false;
+                                        else if (dice.active && 25 - dice.getRand() == i)
+                                            dice.active = false;
+                                    }
+                                } else if (turn == -1) {
+                                    System.out.println(2);
+                                    if (dice.active && i == dice.getRand() && whiteInPlace[i] < 2 && (cordinator[i].xcordinateBegin < e.getX() && cordinator[i].xcordinateEnd > e.getX() && e.getY() > 278 && !cordinator[i].top)) {
+                                        System.out.println(i);
+                                        if (whiteInPlace[i] == 1) {
+                                            System.out.println(3);
+                                            for (int j = 16; j < 31; j++) {
+                                                if (pieces.get(j).x + 5 < cordinator[i].xcordinateEnd && pieces.get(j).x + 5 > cordinator[i].xcordinateBegin && ((pieces.get(j).y > 278 && !cordinator[i].top))) { //
+                                                    System.out.println(j);
+                                                    pieces.get(j).oldx = pieces.get(j).x;
+                                                    pieces.get(j).x = 260;
+                                                    pieces.get(j).oldy = pieces.get(j).y;
+                                                    pieces.get(j).y = 700 - whitePieceOut * 46;
+                                                    whitePieceOut++;
+                                                    whiteInPlace[i] = 0;
+                                                }
+                                            }
+                                        }
+                                        pieces.get(clickedPiece).oldx = pieces.get(clickedPiece).x;
+                                        pieces.get(clickedPiece).oldy = pieces.get(clickedPiece).y;
+                                        pieces.get(clickedPiece).x = cordinator[i].xcordinateBegin + 5;
+                                        if (blackInPlace[i] < 5)
+                                            pieces.get(clickedPiece).y = 510 - 46 * blackInPlace[i] - 46;
+                                        else {
+                                            pieces.get(clickedPiece).y = 510 - 46 * 4 - 46;
+                                            extraCordinates[i] = true;
+                                        }
+                                        fuck = 1;
+                                        dice.active = false;
+                                    }
+                                    if (dice1.active && i == dice1.getRand() && whiteInPlace[i] < 2 && (cordinator[i].xcordinateBegin < e.getX() && cordinator[i].xcordinateEnd > e.getX() && ((e.getY() < 278 && cordinator[i].top) || (e.getY() > 278 && !cordinator[i].top)))) {
+                                        System.out.println(i);
+                                        if (whiteInPlace[i] == 1) {
+                                            for (int j = 16; j < 31; j++) {
+                                                if (pieces.get(j).x + 10 < cordinator[i].xcordinateEnd && pieces.get(j).x + 10 > cordinator[i].xcordinateBegin && ((pieces.get(j).y < 278 && cordinator[i].top) || (pieces.get(j).y > 278 && !cordinator[i].top))) { //
+                                                    System.out.println(j);
+                                                    pieces.get(j).oldx = pieces.get(j).x;
+                                                    pieces.get(j).x = 260;
+                                                    pieces.get(j).oldy = pieces.get(j).y;
+                                                    pieces.get(j).y = 700 - whitePieceOut * 46;
+                                                    whitePieceOut++;
+                                                    whiteInPlace[i] = 0;
+                                                }
+                                            }
+                                        }
+                                        pieces.get(clickedPiece).oldx = pieces.get(clickedPiece).x;
+                                        pieces.get(clickedPiece).oldy = pieces.get(clickedPiece).y;
+                                        pieces.get(clickedPiece).x = cordinator[i].xcordinateBegin + 5;
+                                        if (blackInPlace[i] < 5)
+                                            pieces.get(clickedPiece).y = 510 - 46 * blackInPlace[i] - 46;
+                                        else {
+                                            pieces.get(clickedPiece).y = 510 - 46 * 4 - 46;
+                                            extraCordinates[i] = true;
+                                        }
+                                        fuck = 1;
+                                        dice1.active = false;
+
+                                    }
+                                    if (fuck == 1) {
+                                        blackPieceOut--;
+                                        blackInPlace[i]++;
+
+                                    }
+                                    if (dice.getRand() == dice1.getRand()) {
+                                        if (dice3.active && dice3.getRand() == i)
+                                            dice3.active = false;
+                                        else if (dice2.active && dice2.getRand() == i)
+                                            dice2.active = false;
+                                        else if (dice1.active && dice1.getRand() == i)
+                                            dice1.active = false;
+                                        else if (dice.active && dice.getRand() == i)
+                                            dice.active = false;
                                     }
                                 }
-                            }
-
-                            if (pieces.get(clickedPiece).color == "black" && whiteInPlace[i]==1) {
-                                for (int j = 16; j < 31; j++) {
-                                    if (pieces.get(j).x + 10 < cordinator[i].xcordinateEnd && pieces.get(j).x + 10 > cordinator[i].xcordinateBegin  && ((pieces.get(j).y < 278 && cordinator[i].top) || (pieces.get(j).y > 278 && !cordinator[i].top))) {
-                                        pieces.get(j).oldx = pieces.get(j).x;
-                                        pieces.get(j).x = 260;
-                                        pieces.get(j).oldy = pieces.get(j).y;
-                                        pieces.get(j).y = 700 - whitePieceOut * 46;
-                                        whitePieceOut++;
-                                        whiteInPlace[i] = 0;
+                            } else if (cordinator[i].xcordinateBegin < e.getX() && cordinator[i].xcordinateEnd > e.getX() && ((e.getY() < 278 && cordinator[i].top) || (e.getY() > 278 && !cordinator[i].top)) && pieces.get(clickedPiece).possibleCordinates[i] && ((pieces.get(clickedPiece).color == "white" && whitePieceOut == 0 && turn == 1) || (pieces.get(clickedPiece).color == "black" && blackPieceOut == 0 && turn == -1))) {
+                                // System.out.println("خر");
+                                if (pieces.get(clickedPiece).color == "white" && blackInPlace[i] == 1) {
+                                    for (int j = 1; j < 16; j++) {
+                                        if (pieces.get(j).x + 10 < cordinator[i].xcordinateEnd && pieces.get(j).x + 10 > cordinator[i].xcordinateBegin && ((pieces.get(j).y < 278 && cordinator[i].top) || (pieces.get(j).y > 278 && !cordinator[i].top))) { //
+                                            pieces.get(j).oldx = pieces.get(j).x;
+                                            pieces.get(j).x = 660;
+                                            pieces.get(j).oldy = pieces.get(j).y;
+                                            pieces.get(j).y = 700 - blackPieceOut * 46;
+                                            blackPieceOut++;
+                                            blackInPlace[i] = 0;
+                                        }
                                     }
                                 }
+
+                                if (pieces.get(clickedPiece).color == "black" && whiteInPlace[i] == 1) {
+                                    for (int j = 16; j < 31; j++) {
+                                        if (pieces.get(j).x + 10 < cordinator[i].xcordinateEnd && pieces.get(j).x + 10 > cordinator[i].xcordinateBegin && ((pieces.get(j).y < 278 && cordinator[i].top) || (pieces.get(j).y > 278 && !cordinator[i].top))) {
+                                            pieces.get(j).oldx = pieces.get(j).x;
+                                            pieces.get(j).x = 260;
+                                            pieces.get(j).oldy = pieces.get(j).y;
+                                            pieces.get(j).y = 700 - whitePieceOut * 46;
+                                            whitePieceOut++;
+                                            whiteInPlace[i] = 0;
+                                        }
+                                    }
+                                }
+                                //    System.out.println(blackPieceOut+whitePieceOut);
+
+                                pieces.get(clickedPiece).oldx = pieces.get(clickedPiece).x;
+                                pieces.get(clickedPiece).x = cordinator[i].xcordinateBegin + 5;
+                                temp = blackInPlace[i] + whiteInPlace[i];
+                                pieces.get(clickedPiece).oldy = pieces.get(clickedPiece).y;
+                                if (cordinator[i].top)
+                                    if (temp < 5)
+                                        pieces.get(clickedPiece).y = 46 * temp + 28;
+                                    else {
+                                        pieces.get(clickedPiece).y = 46 * 4 + 28;
+                                        extraCordinates[i] = true;
+                                    }
+
+                                if (!cordinator[i].top)
+                                    if (temp < 5)
+                                        pieces.get(clickedPiece).y = 510 - 46 * temp - 46;
+                                    else {
+                                        pieces.get(clickedPiece).y = 510 - 46 * 4 - 46;
+                                        extraCordinates[i] = true;
+                                    }
+
+                                if (pieces.get(clickedPiece).color == "white") {
+                                    whiteInPlace[movedFrom]--;
+                                    if (whiteInPlace[movedFrom] < 6)
+                                        extraCordinates[movedFrom] = false;
+                                    whiteInPlace[i]++;
+                                } else if (pieces.get(clickedPiece).color == "black") {
+                                    blackInPlace[movedFrom]--;
+                                    if (blackInPlace[movedFrom] < 6)
+                                        extraCordinates[movedFrom] = false;
+                                    blackInPlace[i]++;
+                                }
+                                if (dice.getRand() != dice1.getRand()) {
+                                    if ((dice.getRand() == movedFrom - i) | (dice.getRand() == i - movedFrom))
+                                        dice.active = false;
+                                    if ((dice1.getRand() == movedFrom - i) | (dice1.getRand() == i - movedFrom))
+                                        dice1.active = false;
+                                }
+                                if (dice.getRand() == dice1.getRand()) {
+                                    if (dice3.active && ((dice3.getRand() == movedFrom - i) | (dice3.getRand() == i - movedFrom)))
+                                        dice3.active = false;
+                                    else if (dice2.active && ((dice2.getRand() == movedFrom - i) | (dice2.getRand() == i - movedFrom)))
+                                        dice2.active = false;
+                                    else if (dice1.active && ((dice1.getRand() == movedFrom - i) | (dice1.getRand() == i - movedFrom)))
+                                        dice1.active = false;
+                                    else if (dice.active && ((dice.getRand() == movedFrom - i) | (dice.getRand() == i - movedFrom)))
+                                        dice.active = false;
+                                }
                             }
-
-                            pieces.get(clickedPiece).oldx = pieces.get(clickedPiece).x;
-                            pieces.get(clickedPiece).x = cordinator[i].xcordinateBegin+5;
-                            temp = blackInPlace[i] + whiteInPlace[i];
-                            pieces.get(clickedPiece).oldy = pieces.get(clickedPiece).y;
-                            if (cordinator[i].top)
-                                if (temp < 5)
-                                    pieces.get(clickedPiece).y = 46*temp + 28;
-                                else{
-                                    pieces.get(clickedPiece).y = 46*4 + 28;
-                                    extraCordinates[i] = true;}
-
-                            if (!cordinator[i].top)
-                                if (temp < 5)
-                                    pieces.get(clickedPiece).y = 510 - 46*temp - 46;
-                                else{
-                                    pieces.get(clickedPiece).y = 510 - 46*4 - 46;
-                                    extraCordinates[i] = true;}
-
-                            if (pieces.get(clickedPiece).color == "white"){
+                        }
+                    }
+                    if (whiteEnd && turn==1){
+                        counter = 0;
+                        if(e.getX()>840 && e.getX()< 890&& e.getY()>278){
+                            if (dice.getRand()==movedFrom && dice.active){
+                                pieces.get(clickedPiece).ingame = false;
                                 whiteInPlace[movedFrom]--;
-                                if (whiteInPlace[movedFrom]<6)
-                                    extraCordinates[movedFrom] = false;
-                                whiteInPlace[i]++;
+                                whiteWin--;
+                                dice.active = false;
+                                repaint();
                             }
-                            else if (pieces.get(clickedPiece).color == "black"){
-                                blackInPlace[movedFrom]--;
-                                if (blackInPlace[movedFrom]<6)
-                                    extraCordinates[movedFrom] = false;
-                                blackInPlace[i]++;
-                            }
-                            if(dice.getRand()!=dice1.getRand()){
-                                    if((dice.getRand() == movedFrom-i)|(dice.getRand()==i-movedFrom))
-                                        dice.active=false;
-                                if((dice1.getRand() == movedFrom-i)|(dice1.getRand()==i-movedFrom))
-                                    dice1.active=false;
-                            }
-                            if(dice.getRand()==dice1.getRand()){
-                                if(dice3.active&&((dice3.getRand() == movedFrom-i)|(dice3.getRand()==i-movedFrom)))
-                                    dice3.active=false;
-                                else if(dice2.active&&((dice2.getRand() == movedFrom-i)|(dice2.getRand()==i-movedFrom)))
-                                    dice2.active=false;
-                                else if(dice1.active&&((dice1.getRand() == movedFrom-i)|(dice1.getRand()==i-movedFrom)))
-                                    dice1.active=false;
-                                else if(dice.active&&((dice.getRand() == movedFrom-i)|(dice.getRand()==i-movedFrom)))
-                                    dice.active=false;
+                            else if (dice.getRand() > movedFrom && dice.active){
+                                for (int i = movedFrom+1; i < 7 ; i++) {
+                                    if (whiteInPlace[i] != 0)
+                                        counter++;
+                                }
+                                if (counter == 0) {
+                                    pieces.get(clickedPiece).ingame = false;
+                                    whiteInPlace[movedFrom]--;
+                                    whiteWin--;
+                                    dice.active = false ;
+                                    repaint();
+                                }
                             }
 
+                            if (dice1.getRand()==movedFrom && dice1.active){
+                                pieces.get(clickedPiece).ingame = false;
+                                whiteInPlace[movedFrom]--;
+                                whiteWin--;
+                                dice1.active = false;
+                                repaint();
+                            }
+                            else if (dice1.getRand() > movedFrom && dice1.active){
+                                for (int i = movedFrom+1; i < 7 ; i++) {
+                                    if (whiteInPlace[i] != 0)
+                                        counter++;
+                                }
+                                if (counter == 0) {
+                                    pieces.get(clickedPiece).ingame = false;
+                                    whiteInPlace[movedFrom]--;
+                                    whiteWin--;
+                                    dice1.active = false ;
+                                    repaint();
+                                }
+                            }
+                            else if (dice.getRand() == dice1.getRand()){
+                                dice.active=true;
+                                dice1.active=true;
+                                dice3.active=false;
+                                dice2.active=false;
+                                if (dice.getRand()==movedFrom && dice.active){
+                                    pieces.get(clickedPiece).ingame = false;
+                                    whiteInPlace[movedFrom]--;
+                                    whiteWin--;
+                                    dice.active = false;
+                                    repaint();
+                                }
+                                else if (dice.getRand() > movedFrom && dice.active){
+                                    for (int i = movedFrom+1; i < 7 ; i++) {
+                                        if (whiteInPlace[i] != 0)
+                                            counter++;
+                                    }
+                                    if (counter == 0) {
+                                        pieces.get(clickedPiece).ingame = false;
+                                        whiteInPlace[movedFrom]--;
+                                        whiteWin--;
+                                        dice.active = false ;
+                                        repaint();
+                                    }
+                                }
 
-
+                                if (dice1.getRand()==movedFrom && dice1.active){
+                                    pieces.get(clickedPiece).ingame = false;
+                                    whiteInPlace[movedFrom]--;
+                                    whiteWin--;
+                                    dice1.active = false;
+                                    repaint();
+                                }
+                                else if (dice1.getRand() > movedFrom && dice1.active){
+                                    for (int i = movedFrom+1; i < 7 ; i++) {
+                                        if (whiteInPlace[i] != 0)
+                                            counter++;
+                                    }
+                                    if (counter == 0) {
+                                        pieces.get(clickedPiece).ingame = false;
+                                        whiteInPlace[movedFrom]--;
+                                        whiteWin--;
+                                        dice1.active = false ;
+                                        repaint();
+                                    }
+                                }
+                            }
 
                         }
                     }
+                    else if (blackEnd && turn==-1){
+
+                        counter = 0;
+                        if(e.getX()>840 && e.getX()< 890&& e.getY()<278){
+                            if (dice.getRand()==25-movedFrom && dice.active){
+                                pieces.get(clickedPiece).ingame = false;
+                                blackInPlace[movedFrom]--;
+                                blackWin--;
+                                dice.active = false;
+                                repaint();
+                            }
+                            else if (dice.getRand() > 25-movedFrom && dice.active){
+                                for (int i = movedFrom-1; i > 18 ; i--) {
+                                    if (blackInPlace[i] != 0)
+                                        counter++;
+                                }
+                                if (counter == 0) {
+                                    pieces.get(clickedPiece).ingame = false;
+                                    blackInPlace[movedFrom]--;
+                                    blackWin--;
+                                    dice.active = false ;
+                                    repaint();
+                                }
+                            }
+
+                            if (dice1.getRand()==25-movedFrom && dice1.active){
+                                pieces.get(clickedPiece).ingame = false;
+                                blackInPlace[movedFrom]--;
+                                blackWin--;
+                                dice1.active = false;
+                                repaint();
+                            }
+                            else if (dice1.getRand() > 25-movedFrom && dice1.active){
+                                for (int i = movedFrom-1; i > 18 ; i--) {
+                                    if (blackInPlace[i] != 0)
+                                        counter++;
+                                }
+                                if (counter == 0) {
+                                    pieces.get(clickedPiece).ingame = false;
+                                    blackInPlace[movedFrom]--;
+                                    blackWin--;
+                                    dice1.active = false ;
+                                    repaint();
+                                }
+                            }
+                            else if (dice.getRand() == dice1.getRand()){
+                                dice.active=true;
+                                dice1.active=true;
+                                dice3.active=false;
+                                dice2.active=false;
+                                if (dice.getRand()==25-movedFrom && dice.active){
+                                    pieces.get(clickedPiece).ingame = false;
+                                    blackInPlace[movedFrom]--;
+                                    blackWin--;
+                                    dice.active = false;
+                                    repaint();
+                                }
+                                else if (dice.getRand() > 25-movedFrom && dice.active){
+                                    for (int i = movedFrom-1; i > 18 ; i--) {
+                                        if (blackInPlace[i] != 0)
+                                            counter++;
+                                    }
+                                    if (counter == 0) {
+                                        pieces.get(clickedPiece).ingame = false;
+                                        blackInPlace[movedFrom]--;
+                                        blackWin--;
+                                        dice.active = false ;
+                                        repaint();
+                                    }
+                                }
+
+                                if (dice1.getRand()==25-movedFrom && dice1.active){
+                                    pieces.get(clickedPiece).ingame = false;
+                                    blackInPlace[movedFrom]--;
+                                    blackWin--;
+                                    dice1.active = false;
+                                    repaint();
+                                }
+                                else if (dice1.getRand() > 25-movedFrom && dice1.active){
+                                    for (int i = movedFrom-1; i >18 ; i--) {
+                                        if (blackInPlace[i] != 0)
+                                            counter++;
+                                    }
+                                    if (counter == 0) {
+                                        pieces.get(clickedPiece).ingame = false;
+                                        blackInPlace[movedFrom]--;
+                                        blackWin--;
+                                        dice1.active = false ;
+                                        repaint();
+                                    }
+                                }
+                            }
+
+                        }
+
+                    }
+
+
                 }
                 //System.out.println(whiteInPlace[6]);
 //                System.out.println(possiblePieces[clickedPiece]);
@@ -378,10 +789,16 @@ public class MainPanel extends JPanel {
         g.drawImage(bufferedImagebg, 0, 0, null);
         g.drawImage(bufferedImage, 0, 0, null);
         g.setColor(Color.BLACK);
+//        if (!dice1.active)
+//
         dice.paint((Graphics2D) g);
         dice1.paint((Graphics2D) g);
         //g.drawString("ssss",450,278);
+        g.setColor(GREEN);
+        g.fillPolygon(triangle);
+        g.fillPolygon(triangle1);
 
+//        g.set(.5);
         while(dice.getBegin()==0){
             if(dice.getRand()>dice1.getRand()){
                 turn=1;
@@ -401,7 +818,8 @@ public class MainPanel extends JPanel {
         }
         // System.out.print(playerturn);
 
-        if(dice.getBegin()==1&&dice.getRand()==dice1.getRand()){
+
+         if(dice.getBegin()==1&&dice.getRand()==dice1.getRand()){
             dice2.setRand(dice.getRand());
             dice3.setRand(dice1.getRand());
             dice2.paint((Graphics2D) g);
@@ -409,22 +827,45 @@ public class MainPanel extends JPanel {
         }
 
         for (int i = 1; i < 31; i++) {
-            if(pieces.get(i).color=="black")
+            if(pieces.get(i).color=="black" && pieces.get(i).ingame)
                 g.drawImage(blackPieceNotHighlighted, pieces.get(i).x, pieces.get(i).y, null);
-            else if(pieces.get(i).color=="white")
+            else if(pieces.get(i).color=="white" && pieces.get(i).ingame)
                 g.drawImage(whitePieceNotHighlighted, pieces.get(i).x, pieces.get(i).y, null);
+            else if(pieces.get(i).color=="white" && !pieces.get(i).ingame)
+                g.drawRect(840, 515-(15-whiteWin)*10, 50, 10);
+            else if(pieces.get(i).color=="black" && !pieces.get(i).ingame)
+                g.drawRect(840, 175-(15-blackWin)*10, 50, 10);
         }
+        if (whiteWin==0)
+            g.drawString("white won!", 350, 250);
+        if (blackWin==0)
+            g.drawString("black won!", 350, 250);
         //writing number on pieces in cordinates more than five
+//        blackPieceNotHighlighted.createGraphics();
+//        ((Graphics2D) g).setStroke(new BasicStroke(10));
+//        ((Graphics2D) g).setPaint(GREEN);
+
         for (int i = 1; i <25 ; i++) {
             temp = whiteInPlace[i] + blackInPlace[i];
-            if (extraCordinates[i] && cordinator[i].top)
+            if (extraCordinates[i] && cordinator[i].top && temp-5>0)
                 g.drawString(Integer.toString(temp-5), cordinator[i].xcordinateMean-5, 46 * 5 + 28 -10);
-            if (extraCordinates[i] && !cordinator[i].top)
+            if (extraCordinates[i] && !cordinator[i].top && temp-5>0)
                 g.drawString(Integer.toString(temp-5), cordinator[i].xcordinateMean-5, 510 - 46 * 5 +35);
-
-
         }
 
+
+
+
+
+
+
+        if (turn == 1)
+            g.drawString("white turn", 400, 600);
+        if (turn == -1)
+            g.drawString("black turn", 400, 600);
+
     }
+
+//emtiaz, bugha, etelaat zade va
 
 }
