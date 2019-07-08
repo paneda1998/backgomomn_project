@@ -420,9 +420,9 @@ public class MainPanel extends JPanel {
                                         whitePieceOut--;
                                     }
                                     if (dice.getRand() != dice1.getRand()) {
-                                        if ((dice.getRand() == movedFrom - i) | (dice.getRand() == i - movedFrom))
+                                        if (dice.getRand() == 25 - i)
                                             dice.active = false;
-                                        if ((dice1.getRand() == movedFrom - i) | (dice1.getRand() == i - movedFrom))
+                                        if (dice1.getRand() == 25 - i)
                                             dice1.active = false;}
                                     if (dice.getRand() == dice1.getRand()) {
                                         if (dice3.active && 25 - dice3.getRand() == i)
@@ -569,19 +569,18 @@ public class MainPanel extends JPanel {
                                     blackInPlace[i]++;
                                 }
                                 if (dice.getRand() != dice1.getRand()) {
-                                    if ((dice.getRand() == movedFrom - i) | (dice.getRand() == i - movedFrom))
+                                    if (dice.getRand() == i)
                                         dice.active = false;
-                                    if ((dice1.getRand() == movedFrom - i) | (dice1.getRand() == i - movedFrom))
-                                        dice1.active = false;
-                                }
+                                    if (dice1.getRand() == i)
+                                        dice1.active = false;}
                                 if (dice.getRand() == dice1.getRand()) {
-                                    if (dice3.active && ((dice3.getRand() == movedFrom - i) | (dice3.getRand() == i - movedFrom)))
+                                    if (dice3.active && dice3.getRand() == i)
                                         dice3.active = false;
-                                    else if (dice2.active && ((dice2.getRand() == movedFrom - i) | (dice2.getRand() == i - movedFrom)))
+                                    else if (dice2.active && dice2.getRand() == i)
                                         dice2.active = false;
-                                    else if (dice1.active && ((dice1.getRand() == movedFrom - i) | (dice1.getRand() == i - movedFrom)))
+                                    else if (dice1.active && dice1.getRand() == i)
                                         dice1.active = false;
-                                    else if (dice.active && ((dice.getRand() == movedFrom - i) | (dice.getRand() == i - movedFrom)))
+                                    else if (dice.active && dice.getRand() == i)
                                         dice.active = false;
                                 }
                             }
