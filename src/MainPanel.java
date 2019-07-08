@@ -24,6 +24,8 @@ public class MainPanel extends JPanel {
     int whiteWin=15;
     int blackWin=15;
     int counter = 0;
+    int whiteDice=0;
+    int blackDice=0;
     boolean whiteEnd= false;
     boolean blackEnd=false;
     boolean[] extraCordinates = new boolean[25];
@@ -184,6 +186,14 @@ public class MainPanel extends JPanel {
                     }
                     tt = 1;
                 }
+                if (turn==1 && dice.getRand()!=dice1.getRand())
+                    whiteDice+=dice.getRand() + dice1.getRand();
+                else if (turn==1 && dice.getRand()==dice1.getRand())
+                    whiteDice+=dice.getRand()*4;
+                if (turn==-1 && dice.getRand()!=dice1.getRand())
+                    blackDice+=dice.getRand() + dice1.getRand();
+                else if (turn==-1 && dice.getRand()==dice1.getRand())
+                    blackDice+=dice.getRand()*4;
             }
 
             @Override
@@ -846,7 +856,7 @@ public class MainPanel extends JPanel {
             }
         }
 
-         if(dice.getBegin()==1&&dice.getRand()==dice1.getRand()){
+        if(dice.getBegin()==1&&dice.getRand()==dice1.getRand()){
             dice2.setRand(dice.getRand());
             dice3.setRand(dice1.getRand());
             dice2.paint((Graphics2D) g);
@@ -870,8 +880,8 @@ public class MainPanel extends JPanel {
             }
             else if(pieces.get(i).color=="white" && !impossiblePieces[i]){
                 for (int j = 1; j <16-whiteWin ; j++) {
-                g.drawRect(840, 510-(j)*13, 50, 10);
-                g.fillRect(840, 510-(j)*13, 50, 10);
+                    g.drawRect(840, 510-(j)*13, 50, 10);
+                    g.fillRect(840, 510-(j)*13, 50, 10);
                 }
             }
 
@@ -883,6 +893,8 @@ public class MainPanel extends JPanel {
         g.drawString("white out pieces: "+ (15-whiteWin), 230,630 );
         g.drawString("black hitted pieces: "+ blackPieceOut, 630,600 );
         g.drawString("black out pieces: "+ (15-blackWin), 630,630 );
+        g.drawString(Integer.toString(whiteDice), 230, 660);
+        g.drawString(Integer.toString(blackDice), 630, 660);
 
         g.setColor(GREEN);
         g.setFont(new Font("test2" , Font.BOLD , 30));
@@ -904,6 +916,8 @@ public class MainPanel extends JPanel {
             else
                 g.drawString("score: 90", 350, 280);
         }
+
+
 
         for (int i = 1; i <25 ; i++) {
             temp = whiteInPlace[i] + blackInPlace[i];
